@@ -1,0 +1,11 @@
+{
+  "name": "marrow",
+  "version": "0.5.1",
+  "description": "Standalone knowledge store and session management for AI-assisted project work",
+  "author": {
+    "name": "tinqr"
+  },
+  "repository": "https://github.com/tinqr/marrow",
+  "license": "MIT",
+  "keywords": ["knowledge", "context", "session", "memory", "project-management"]
+}

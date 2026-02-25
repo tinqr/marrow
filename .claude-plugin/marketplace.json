@@ -1,0 +1,17 @@
+{
+  "name": "tinqr-marrow",
+  "owner": {
+    "name": "tinqr"
+  },
+  "metadata": {
+    "description": "Knowledge store and session management for AI-assisted project work"
+  },
+  "plugins": [
+    {
+      "name": "marrow",
+      "source": "./",
+      "description": "Standalone knowledge store — session logs, notes, and wiki links across all your projects",
+      "version": "0.5.1"
+    }
+  ]
+}
