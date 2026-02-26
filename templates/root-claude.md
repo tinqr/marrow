@@ -1,4 +1,4 @@
-<!-- marrow:root:v0.5.1 -->
+<!-- marrow:root:v0.5.2 -->
 # Marrow
 
 Your context, across sessions, across tools.
@@ -21,8 +21,9 @@ What I do:
 
 Your projects live in `projects.md`. Each project has its own folder with:
 - `CLAUDE.md` — project description, active tasks, and session log
-- `index.md` — knowledge map of all notes and their connections
 - `session-archive.md` — older session log entries
+
+The global `index.md` maps all notes across all projects.
 
 To see all projects, read `projects.md`. To load a specific project, use `/recall <project>`.
 
@@ -34,7 +35,7 @@ To see all projects, read `projects.md`. To load a specific project, use `/recal
 | `/checkpoint` | Save your session progress |
 | `/new-project` | Add a new project |
 | `/joint` | Connect an external project folder to Marrow |
-| `/reindex` | Rebuild indexes and fix broken links (all projects if none specified) |
+| `/reindex` | Rebuild the global index and fix broken links |
 
 ## Session Log Format
 

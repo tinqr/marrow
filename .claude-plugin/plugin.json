@@ -1,6 +1,6 @@
 {
   "name": "marrow",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Standalone knowledge store and session management for AI-assisted project work",
   "author": {
     "name": "tinqr"

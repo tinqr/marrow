@@ -11,7 +11,7 @@
       "name": "marrow",
       "source": "./",
       "description": "Standalone knowledge store — session logs, notes, and wiki links across all your projects",
-      "version": "0.5.1"
+      "version": "0.5.2"
     }
   ]
 }

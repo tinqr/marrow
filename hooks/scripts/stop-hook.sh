@@ -1,6 +1,6 @@
 #!/bin/bash
 # Marrow Stop hook — checkpoint reminder
-# Fires after every agent turn. Five guards prevent spam.
+# Fires after every agent turn. Guards prevent spam.
 
 # Guard 1: Is this a Marrow session?
 # (session-start file is written by SessionStart hook)

@@ -1,8 +1,8 @@
 #!/bin/bash
-# Marrow SessionStart hook — detect Marrow, show landscape
+# Marrow SessionStart hook — detect Marrow, show landscape + knowledge index
 
 # Detection: is this a Marrow directory?
-if [ ! -f "./CLAUDE.md" ] || ! grep -q '<!-- marrow:root:v0\.5\.1 -->' "./CLAUDE.md" 2>/dev/null; then
+if [ ! -f "./CLAUDE.md" ] || ! grep -q '<!-- marrow:root:v0\.5\.2 -->' "./CLAUDE.md" 2>/dev/null; then
   exit 0
 fi
 
@@ -83,29 +83,6 @@ while IFS= read -r line; do
       if [ -n "$first_activity" ]; then
         echo "  ${first_activity#- }"
       fi
-      # Count notes in project directory
-      if [ -d "./$current_project" ]; then
-        note_names=""
-        note_count=0
-        for f in "./$current_project"/*.md; do
-          [ -f "$f" ] || continue
-          bn=$(basename "$f" .md)
-          case "$bn" in CLAUDE|index|session-archive) continue ;; esac
-          note_count=$((note_count + 1))
-          if [ $note_count -le 5 ]; then
-            [ -n "$note_names" ] && note_names="$note_names, "
-            note_names="$note_names$bn"
-          fi
-        done
-        if [ $note_count -gt 0 ]; then
-          if [ $note_count -gt 5 ]; then
-            extra=$((note_count - 5))
-            echo "  Notes: $note_names (+$extra more)"
-          else
-            echo "  Notes: $note_names"
-          fi
-        fi
-      fi
       # Stale detection: check if last activity > 7 days
       if [ -n "$first_activity" ]; then
         if [[ "$first_activity" =~ ([0-9]{4}-[0-9]{2}-[0-9]{2}) ]]; then
@@ -142,28 +119,6 @@ if [ -n "$current_project" ] && [ "$current_status" = "active" ]; then
   echo "$current_project"
   if [ -n "$first_activity" ]; then
     echo "  ${first_activity#- }"
-  fi
-  if [ -d "./$current_project" ]; then
-    note_names=""
-    note_count=0
-    for f in "./$current_project"/*.md; do
-      [ -f "$f" ] || continue
-      bn=$(basename "$f" .md)
-      case "$bn" in CLAUDE|index|session-archive) continue ;; esac
-      note_count=$((note_count + 1))
-      if [ $note_count -le 5 ]; then
-        [ -n "$note_names" ] && note_names="$note_names, "
-        note_names="$note_names$bn"
-      fi
-    done
-    if [ $note_count -gt 0 ]; then
-      if [ $note_count -gt 5 ]; then
-        extra=$((note_count - 5))
-        echo "  Notes: $note_names (+$extra more)"
-      else
-        echo "  Notes: $note_names"
-      fi
-    fi
   fi
   if [ -n "$first_activity" ]; then
     if [[ "$first_activity" =~ ([0-9]{4}-[0-9]{2}-[0-9]{2}) ]]; then
@@ -213,6 +168,14 @@ if [ -n "$current_project" ] && [ "$current_status" = "paused" ]; then
     echo "## Paused"
   fi
   echo "  $current_project"
+fi
+
+# Knowledge index
+if [ -f "./index.md" ]; then
+  echo ""
+  echo "## Knowledge"
+  # Print index content, skip the H1 header and blank lines at top
+  sed -n '/^## /,$p' "./index.md"
 fi
 
 echo ""

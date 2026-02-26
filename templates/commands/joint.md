@@ -11,7 +11,7 @@ Connect an external project folder to Marrow. A joint is where two bones meet â€
 ## Preflight
 
 Determine the Marrow root. Check common locations in order:
-1. If `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`, the current directory IS the Marrow root.
+1. If `./CLAUDE.md` contains `<!-- marrow:root:v0.5.2 -->`, the current directory IS the Marrow root.
 2. If `~/marrow/CLAUDE.md` contains the marker, use `~/marrow/`.
 3. Otherwise, tell the user this isn't a Marrow directory. You can set one up with `/marrow:setup`.
 
@@ -64,7 +64,7 @@ This project's knowledge store is at `MARROW_ROOT/PROJECT_NAME/`.
 
 When starting work on this project:
 1. Read `MARROW_ROOT/PROJECT_NAME/CLAUDE.md` for session history and context
-2. Read `MARROW_ROOT/PROJECT_NAME/index.md` for the knowledge map
+2. Read `MARROW_ROOT/index.md` for the knowledge map
 
 When finishing work:
 1. Use `/checkpoint` to save progress (if Marrow plugin is installed)
@@ -85,7 +85,7 @@ This project's knowledge store is at `MARROW_ROOT/PROJECT_NAME/`.
 
 When starting work on this project:
 1. Read `MARROW_ROOT/PROJECT_NAME/CLAUDE.md` for session history and context
-2. Read `MARROW_ROOT/PROJECT_NAME/index.md` for the knowledge map
+2. Read `MARROW_ROOT/index.md` for the knowledge map
 
 When finishing work:
 1. Use `/checkpoint` to save progress (if Marrow plugin is installed)

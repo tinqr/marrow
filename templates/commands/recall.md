@@ -10,7 +10,7 @@ Load and summarize a project's current state.
 
 ## Preflight
 
-Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`. If not, tell the user: **"This isn't a Marrow directory. You can set one up with `/marrow:setup`."**
+Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.2 -->`. If not, tell the user: **"This isn't a Marrow directory. You can set one up with `/marrow:setup`."**
 
 ## Step 1: Identify the project
 
@@ -23,7 +23,7 @@ Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`. If not, tell th
 ## Step 2: Read project context
 
 1. Read `./PROJECT_NAME/CLAUDE.md` — get description, active tasks, and session log
-2. Read `./PROJECT_NAME/index.md` — get the knowledge map
+2. Read `./index.md` — find the `## PROJECT_NAME` section for its knowledge map
 
 ## Step 3: Check staleness
 
@@ -39,7 +39,7 @@ Present a clear summary:
 2. **Active tasks:** from the Active Tasks section
 3. **Last session:** date, agent, what changed, decisions
 4. **Next step:** from the last session log's "Next:" field
-5. **Knowledge:** list of notes from index.md with brief descriptions
+5. **Knowledge:** list of notes for this project from index.md with brief descriptions
 6. **Staleness note** if applicable
 
 End with: **"Ready to work on PROJECT_NAME."**

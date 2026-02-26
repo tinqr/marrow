@@ -58,9 +58,9 @@ Then run `/marrow:setup` — it'll ask you a few questions and set everything up
 ~/marrow/
 ├── CLAUDE.md              # Setup and commands reference
 ├── projects.md            # List of all your projects
+├── index.md               # Global knowledge map across all projects
 └── my-app/
     ├── CLAUDE.md          # Project description, tasks, session log
-    ├── index.md           # Map of all your notes
     ├── session-archive.md # Older session entries
     └── notes...           # Decisions, patterns, anything worth keeping
 ```

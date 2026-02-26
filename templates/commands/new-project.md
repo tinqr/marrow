@@ -10,7 +10,7 @@ Add a new project to this Marrow.
 
 ## Preflight
 
-Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`. If not, tell the user this isn't a Marrow directory. You can set one up with `/marrow:setup`.
+Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.2 -->`. If not, tell the user this isn't a Marrow directory. You can set one up with `/marrow:setup`.
 
 ## Step 1: Project name
 
@@ -36,7 +36,7 @@ mkdir -p ./PROJECT_NAME
 
 Write `./PROJECT_NAME/CLAUDE.md`:
 ```
-<!-- marrow:project:PROJECT_NAME:v0.5.1 -->
+<!-- marrow:project:PROJECT_NAME:v0.5.2 -->
 # PROJECT_NAME
 
 PROJECT_DESCRIPTION
@@ -46,18 +46,6 @@ PROJECT_DESCRIPTION
 (none yet)
 
 ## Session Log
-```
-
-Write `./PROJECT_NAME/index.md`:
-```
----
-description: Knowledge index for PROJECT_NAME
-type: index
----
-
-# PROJECT_NAME — Index
-
-(No notes yet. Notes will appear here as they're created.)
 ```
 
 Write `./PROJECT_NAME/session-archive.md`:
@@ -78,6 +66,16 @@ Status: active
 ### Activity
 ```
 
-## Step 5: Confirm
+## Step 5: Add to global index
+
+Read `./index.md`. Append a new section:
+
+```
+## PROJECT_NAME
+
+(No notes yet.)
+```
+
+## Step 6: Confirm
 
 Print: **"Project 'PROJECT_NAME' created! Use `/recall PROJECT_NAME` to start working on it."**

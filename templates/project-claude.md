@@ -1,4 +1,4 @@
-<!-- marrow:project:PROJECT_NAME:v0.5.1 -->
+<!-- marrow:project:PROJECT_NAME:v0.5.2 -->
 # PROJECT_NAME
 
 PROJECT_DESCRIPTION

@@ -69,7 +69,7 @@ Save your session's progress. This is how context survives between sessions.
 
 ## Preflight
 
-Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`. If not, tell the user: **"This isn't a Marrow directory. You can set one up with `/marrow:setup`."**
+Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.2 -->`. If not, tell the user: **"This isn't a Marrow directory. You can set one up with `/marrow:setup`."**
 
 ## Step 1: Identify the project
 
@@ -117,7 +117,15 @@ Track how many notes were touched. For any notes created or modified during this
 
 Store the count of notes processed as `NOTES_COUNT`.
 
-## Step 5: Update projects.md
+## Step 5: Update global index
+
+Read `./index.md`. Find the `## PROJECT_NAME` section.
+
+For any notes created or modified this session, ensure they appear in the project's section of the global index with their description. Add new entries, update changed descriptions. Keep entries sorted alphabetically.
+
+If the project has no section yet, create one.
+
+## Step 6: Update projects.md
 
 Read `./projects.md`. Find the `### Activity` section under `## PROJECT_NAME`.
 
@@ -129,13 +137,13 @@ Append a new activity entry at the top of the activity list:
 
 If > 5 activity entries, remove the oldest until exactly 5 remain.
 
-## Step 6: Write timestamp
+## Step 7: Write timestamp
 
 ```bash
 date +%s > .marrow/last-checkpoint
 ```
 
-## Step 7: Confirm
+## Step 8: Confirm
 
 If `NOTES_COUNT` > 0:
 **"Checkpointed PROJECT_NAME. Session logged, NOTES_COUNT notes indexed."**
@@ -159,7 +167,7 @@ Load and summarize a project's current state.
 
 ## Preflight
 
-Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`. If not, tell the user: **"This isn't a Marrow directory. You can set one up with `/marrow:setup`."**
+Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.2 -->`. If not, tell the user: **"This isn't a Marrow directory. You can set one up with `/marrow:setup`."**
 
 ## Step 1: Identify the project
 
@@ -172,7 +180,7 @@ Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`. If not, tell th
 ## Step 2: Read project context
 
 1. Read `./PROJECT_NAME/CLAUDE.md` — get description, active tasks, and session log
-2. Read `./PROJECT_NAME/index.md` — get the knowledge map
+2. Read `./index.md` — find the `## PROJECT_NAME` section for its knowledge map
 
 ## Step 3: Check staleness
 
@@ -188,7 +196,7 @@ Present a clear summary:
 2. **Active tasks:** from the Active Tasks section
 3. **Last session:** date, agent, what changed, decisions
 4. **Next step:** from the last session log's "Next:" field
-5. **Knowledge:** list of notes from index.md with brief descriptions
+5. **Knowledge:** list of notes for this project from index.md with brief descriptions
 6. **Staleness note** if applicable
 
 End with: **"Ready to work on PROJECT_NAME."**
@@ -209,7 +217,7 @@ Add a new project to this Marrow.
 
 ## Preflight
 
-Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`. If not, tell the user this isn't a Marrow directory. You can set one up with `/marrow:setup`.
+Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.2 -->`. If not, tell the user this isn't a Marrow directory. You can set one up with `/marrow:setup`.
 
 ## Step 1: Project name
 
@@ -235,7 +243,7 @@ mkdir -p ./PROJECT_NAME
 
 Write `./PROJECT_NAME/CLAUDE.md`:
 ```
-<!-- marrow:project:PROJECT_NAME:v0.5.1 -->
+<!-- marrow:project:PROJECT_NAME:v0.5.2 -->
 # PROJECT_NAME
 
 PROJECT_DESCRIPTION
@@ -245,18 +253,6 @@ PROJECT_DESCRIPTION
 (none yet)
 
 ## Session Log
-```
-
-Write `./PROJECT_NAME/index.md`:
-```
----
-description: Knowledge index for PROJECT_NAME
-type: index
----
-
-# PROJECT_NAME — Index
-
-(No notes yet. Notes will appear here as they're created.)
 ```
 
 Write `./PROJECT_NAME/session-archive.md`:
@@ -277,7 +273,17 @@ Status: active
 ### Activity
 ```
 
-## Step 5: Confirm
+## Step 5: Add to global index
+
+Read `./index.md`. Append a new section:
+
+```
+## PROJECT_NAME
+
+(No notes yet.)
+```
+
+## Step 6: Confirm
 
 Print: **"Project 'PROJECT_NAME' created! Use `/recall PROJECT_NAME` to start working on it."**
 ````
@@ -298,7 +304,7 @@ Connect an external project folder to Marrow. A joint is where two bones meet �
 ## Preflight
 
 Determine the Marrow root. Check common locations in order:
-1. If `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`, the current directory IS the Marrow root.
+1. If `./CLAUDE.md` contains `<!-- marrow:root:v0.5.2 -->`, the current directory IS the Marrow root.
 2. If `~/marrow/CLAUDE.md` contains the marker, use `~/marrow/`.
 3. Otherwise, tell the user this isn't a Marrow directory. You can set one up with `/marrow:setup`.
 
@@ -351,7 +357,7 @@ This project's knowledge store is at `MARROW_ROOT/PROJECT_NAME/`.
 
 When starting work on this project:
 1. Read `MARROW_ROOT/PROJECT_NAME/CLAUDE.md` for session history and context
-2. Read `MARROW_ROOT/PROJECT_NAME/index.md` for the knowledge map
+2. Read `MARROW_ROOT/index.md` for the knowledge map
 
 When finishing work:
 1. Use `/checkpoint` to save progress (if Marrow plugin is installed)
@@ -372,7 +378,7 @@ This project's knowledge store is at `MARROW_ROOT/PROJECT_NAME/`.
 
 When starting work on this project:
 1. Read `MARROW_ROOT/PROJECT_NAME/CLAUDE.md` for session history and context
-2. Read `MARROW_ROOT/PROJECT_NAME/index.md` for the knowledge map
+2. Read `MARROW_ROOT/index.md` for the knowledge map
 
 When finishing work:
 1. Use `/checkpoint` to save progress (if Marrow plugin is installed)
@@ -390,25 +396,24 @@ Write `MARROW_ROOT/.claude/commands/reindex.md`:
 
 ````
 ---
-description: Rebuild project index and fix wiki link gaps across all notes
+description: Rebuild the global index and fix wiki link gaps across all notes
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
-argument-hint: "[project-name] — project to reindex (or infer from context)"
+argument-hint: "[project-name] — project to reindex (or omit to reindex all)"
 ---
 
 # Reindex
 
-Full project index rebuild and wiki link maintenance. Run this when the knowledge base needs tidying — not every session.
+Rebuild the global index and maintain wiki links. Run this when the knowledge base needs tidying — not every session.
 
 ## Preflight
 
-Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.1 -->`. If not, tell the user this isn't a Marrow directory. You can set one up with `/marrow:setup`.
+Check that `./CLAUDE.md` contains `<!-- marrow:root:v0.5.2 -->`. If not, tell the user this isn't a Marrow directory. You can set one up with `/marrow:setup`.
 
-## Step 1: Identify the project
+## Step 1: Identify the project(s)
 
-**If `$ARGUMENTS` is provided:** Use it as the project name.
-**If no argument:** Infer from context or ask.
+**If `$ARGUMENTS` is provided:** Use it as the project name. Verify `./PROJECT_NAME/` directory exists. Run Steps 2–4 for that project only.
 
-Verify `./PROJECT_NAME/` directory exists.
+**If no argument:** Read `./projects.md` and collect all project names. Run Steps 2–4 for each project.
 
 ## Step 2: Extract all wiki links
 
@@ -433,7 +438,7 @@ Read the output. Each line: `filename|[[link1]], [[link2]], ...`
 From the link inventory:
 
 1. **Missing backlinks:** Note A links to `[[B]]` but note B doesn't contain `[[A]]`
-2. **Orphan notes:** Notes that no other note links to (no incoming links). Exclude `CLAUDE.md`, `index.md`, and `session-archive.md` from orphan detection.
+2. **Orphan notes:** Notes that no other note links to (no incoming links). Exclude `CLAUDE.md` and `session-archive.md` from orphan detection.
 3. **Dangling links:** `[[target]]` where no file matching `target.md` exists in the project directory
 
 ## Step 4: Fix missing backlinks
@@ -445,30 +450,33 @@ For each missing backlink:
 
 Format: `- [[source-note]] — links here`
 
-## Step 5: Rebuild index.md
+## Step 5: Rebuild global index.md
 
-Write a fresh `./PROJECT_NAME/index.md`:
+Write a fresh `./index.md` with all notes across all projects:
 
 ```
----
-description: Knowledge index for PROJECT_NAME
-type: index
----
+# Index
 
-# PROJECT_NAME — Index
+Global knowledge map. Notes grouped by project.
+
+## PROJECT_NAME_1
 
 - [[note-title-1]] — description from frontmatter
 - [[note-title-2]] — description from frontmatter
+
+## PROJECT_NAME_2
+
+- [[note-title-3]] — description from frontmatter
 ...
 ```
 
-List ALL notes (excluding CLAUDE.md, index.md, session-archive.md). For each note, read its frontmatter `description` field. If no description, use "(no description)".
+For each project, list ALL notes (excluding CLAUDE.md and session-archive.md). For each note, read its frontmatter `description` field. If no description, use "(no description)".
 
-Sort alphabetically by note title.
+Sort notes alphabetically within each project section. Only include project sections that have notes.
 
 ## Step 6: Report
 
-Print a one-line summary: **"Reindexed PROJECT_NAME — N notes, N backlinks added."**
+Print a one-line summary: **"Reindexed — N notes across M projects, N backlinks added."**
 
 Then, only if there are issues:
 - If there are orphan notes, warn: "Orphan notes (no incoming links): list. Consider linking these from other notes or removing them."
@@ -480,7 +488,7 @@ Then, only if there are issues:
 Write to `MARROW_ROOT/CLAUDE.md` with the following content. Replace `USER_NAME`, `USER_ROLE`, and `USER_CONTEXT` with actual values. If `USER_CONTEXT` is empty, omit it (don't leave a trailing period).
 
 ```
-<!-- marrow:root:v0.5.1 -->
+<!-- marrow:root:v0.5.2 -->
 # Marrow
 
 Your context, across sessions, across tools.
@@ -503,8 +511,9 @@ What I do:
 
 Your projects live in `projects.md`. Each project has its own folder with:
 - `CLAUDE.md` — project description, active tasks, and session log
-- `index.md` — knowledge map of all notes and their connections
 - `session-archive.md` — older session log entries
+
+The global `index.md` maps all notes across all projects.
 
 To see all projects, read `projects.md`. To load a specific project, use `/recall <project>`.
 
@@ -516,7 +525,7 @@ To see all projects, read `projects.md`. To load a specific project, use `/recal
 | `/checkpoint` | Save your session progress |
 | `/new-project` | Add a new project |
 | `/joint` | Connect an external project folder to Marrow |
-| `/reindex` | Rebuild indexes and fix broken links (all projects if none specified) |
+| `/reindex` | Rebuild the global index and fix broken links |
 
 ## Session Log Format
 
@@ -567,7 +576,7 @@ Status: active
 Write `MARROW_ROOT/PROJECT_NAME/CLAUDE.md`:
 
 ```
-<!-- marrow:project:PROJECT_NAME:v0.5.1 -->
+<!-- marrow:project:PROJECT_NAME:v0.5.2 -->
 # PROJECT_NAME
 
 PROJECT_DESCRIPTION
@@ -579,19 +588,6 @@ PROJECT_DESCRIPTION
 ## Session Log
 ```
 
-Write `MARROW_ROOT/PROJECT_NAME/index.md`:
-
-```
----
-description: Knowledge index for PROJECT_NAME
-type: index
----
-
-# PROJECT_NAME — Index
-
-(No notes yet. Notes will appear here as they're created.)
-```
-
 Write `MARROW_ROOT/PROJECT_NAME/session-archive.md`:
 
 ```
@@ -600,7 +596,21 @@ Write `MARROW_ROOT/PROJECT_NAME/session-archive.md`:
 Archived session log entries, oldest first.
 ```
 
-## Step 9: Write extract-links.sh helper
+## Step 9: Generate global index
+
+Write `MARROW_ROOT/index.md`:
+
+```
+# Index
+
+Global knowledge map. Notes grouped by project.
+
+## PROJECT_NAME
+
+(No notes yet.)
+```
+
+## Step 10: Write extract-links.sh helper
 
 Write to `MARROW_ROOT/scripts/extract-links.sh`:
 
@@ -631,7 +641,7 @@ done
 
 Then: `chmod +x MARROW_ROOT/scripts/extract-links.sh`
 
-## Step 10: Confirm
+## Step 11: Confirm
 
 Show the created directory structure.
 
