@@ -1,0 +1,7 @@
+maintenance:
+  inbox_warning: 5
+  observations_warning: 10
+  stale_feature_days: 14
+  stale_index_days: 30
+  session_log_max: 8
+  auto_commit_debounce_seconds: 300

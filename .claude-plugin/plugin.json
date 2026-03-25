@@ -1,0 +1,18 @@
+{
+  "name": "marrow",
+  "version": "1.0.0",
+  "description": "Persistent memory for AI coding tools. Automatic session context, note processing, and knowledge management through plain markdown files.",
+  "author": {
+    "name": "tinqr",
+    "url": "https://github.com/tinqr"
+  },
+  "repository": "https://github.com/tinqr/marrow",
+  "license": "MIT",
+  "keywords": [
+    "memory",
+    "knowledge-management",
+    "session-context",
+    "notes",
+    "persistent-memory"
+  ]
+}
