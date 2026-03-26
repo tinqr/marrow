@@ -17,6 +17,12 @@ READ_CONFIG="$GUARD_DIR/read-config.sh"
 
 # -- Archive phase (silent) ---------------------------------------------------
 
+# Capture previous session content BEFORE overwriting, for injection later
+PREV_SESSION_CONTENT=""
+if [ -f ops/sessions/current.json ]; then
+  PREV_SESSION_CONTENT=$(cat ops/sessions/current.json)
+fi
+
 if [ -n "$SESSION_ID" ] && [ "$(bash "$READ_CONFIG" "session_capture" "true")" = "true" ]; then
   TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
   mkdir -p ops/sessions
@@ -66,10 +72,10 @@ echo ""
 echo "---"
 echo ""
 
-# Previous session context
-if [ -f ops/sessions/current.json ]; then
+# Previous session context (captured before archive overwrote current.json)
+if [ -n "$PREV_SESSION_CONTENT" ]; then
   echo "--- Previous session context ---"
-  cat ops/sessions/current.json
+  echo "$PREV_SESSION_CONTENT"
   echo ""
 fi
 

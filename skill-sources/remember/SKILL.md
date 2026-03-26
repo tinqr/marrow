@@ -1,6 +1,9 @@
 ---
 name: remember
 description: Capture friction as methodology notes. Three modes -- explicit (provide description), contextual (scan current conversation for corrections), and scanning (mine session transcripts for patterns). Triggers on "/remember", "/remember [description]", "/remember --scan".
+user-invocable: true
+context: fork
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 
 # /remember

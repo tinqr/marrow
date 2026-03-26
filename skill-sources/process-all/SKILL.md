@@ -1,6 +1,10 @@
 ---
 name: process-all
 description: Batch process the inbox with fresh context per source. Spawns an isolated subagent for each inbox item to prevent context contamination. Supports dry run mode. Triggers on "/process-all", "process inbox", "batch process".
+user-invocable: true
+context: fork
+model: sonnet
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash, Agent
 ---
 
 # /process-all

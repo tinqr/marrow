@@ -1,6 +1,9 @@
 ---
 name: review
 description: Triage accumulated observations. Classifies each finding, detects patterns across them, and generates proposals for system changes. Triggers on "/review", "review observations", "triage findings".
+user-invocable: true
+context: fork
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 
 # /review
