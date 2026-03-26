@@ -39,7 +39,26 @@ echo ""
 if [ -f ops/sessions/current.json ]; then
   echo "--- Previous session context ---"
   cat ops/sessions/current.json
+  LAST_ACTIVITY=$(python3 -c "import json,sys; d=json.load(open('ops/sessions/current.json')); print(d.get('last_activity',''))" 2>/dev/null || true)
+  NOTES_MODIFIED=$(python3 -c "import json,sys; d=json.load(open('ops/sessions/current.json')); mods=d.get('notes_modified',[]); print('\n'.join(mods[:5]))" 2>/dev/null || true)
+  if [ -n "$LAST_ACTIVITY" ]; then
+    echo "last session: $LAST_ACTIVITY"
+  fi
+  if [ -n "$NOTES_MODIFIED" ]; then
+    echo "recently modified:"
+    echo "$NOTES_MODIFIED" | while read -r note; do echo "  - $note"; done
+  fi
   echo ""
+fi
+
+# Active threads summary
+if [ -f self/goals.md ]; then
+  ACTIVE=$(grep -A 20 "## Active Threads" self/goals.md 2>/dev/null | grep "^-" | head -5 || true)
+  if [ -n "$ACTIVE" ]; then
+    echo "active threads:"
+    echo "$ACTIVE" | while read -r line; do echo "  $line"; done
+    echo ""
+  fi
 fi
 
 # Persistent working memory (goals)
