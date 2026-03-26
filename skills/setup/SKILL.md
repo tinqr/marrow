@@ -591,9 +591,31 @@ for skill_dir in "$PLUGIN_ROOT/skill-sources"/*/; do
 done
 ```
 
-**IMPORTANT:** Do not run this as a bash script. Use the Write tool to copy each SKILL.md file individually. Read each file from `${CLAUDE_PLUGIN_ROOT}/skill-sources/[name]/SKILL.md` and write it to `[VAULT_PATH]/.claude/skills/[name]/SKILL.md`.
+Run this as a single Bash command, replacing `[VAULT_PATH]` with the actual vault path. This copies all 12 skills in one operation.
 
-The skills to copy are: `audit`, `check`, `connect`, `extract`, `next`, `process`, `process-all`, `queue`, `remember`, `review`, `revisit`, `tasks`.
+After copying, verify the exact set of skills was installed:
+
+```bash
+ls -1 "[VAULT_PATH]/.claude/skills"/*/SKILL.md | xargs -I{} basename $(dirname {}) | sort
+```
+
+Expected output (all 12, sorted):
+```
+audit
+check
+connect
+extract
+next
+process
+process-all
+queue
+remember
+review
+revisit
+tasks
+```
+
+If any are missing, diagnose before continuing.
 
 ---
 
