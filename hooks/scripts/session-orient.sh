@@ -5,6 +5,17 @@
 GUARD_DIR="$(cd "$(dirname "$0")" && pwd)"
 "$GUARD_DIR/vaultguard.sh" || exit 0
 
+# Check for due reminders
+if [ -f "ops/reminders.md" ]; then
+  TODAY=$(date +%Y-%m-%d)
+  DUE=$(grep -E "^\- \[ \] $TODAY" ops/reminders.md 2>/dev/null || true)
+  if [ -n "$DUE" ]; then
+    echo "REMINDERS DUE TODAY:"
+    echo "$DUE"
+    echo ""
+  fi
+fi
+
 echo "## Workspace Structure"
 echo ""
 
@@ -78,3 +89,20 @@ if [ -d ops/methodology ] && [ -f marrow.yaml ]; then
     fi
   fi
 fi
+
+# Update session state
+SESSION_ID="${CLAUDE_CONVERSATION_ID:-$(date +%Y%m%d-%H%M%S)}"
+SESSION_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+mkdir -p ops/sessions
+
+cat > ops/sessions/current.json << EOF
+{
+  "session_id": "$SESSION_ID",
+  "start_time": "$SESSION_START",
+  "last_activity": "$SESSION_START",
+  "notes_created": [],
+  "notes_modified": [],
+  "discoveries": []
+}
+EOF
