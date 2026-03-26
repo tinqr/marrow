@@ -1,5 +1,5 @@
 ---
-name: marrow:revisit
+name: revisit
 description: Update old notes with new connections. Revisit existing notes that predate newer related content, add connections, sharpen claims, consider splits. Triggers on "/revisit", "/revisit [note]", "update old notes", "backward connections", "revisit notes".
 user-invocable: true
 context: fork

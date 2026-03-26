@@ -1,5 +1,5 @@
 ---
-name: marrow:extract
+name: extract
 description: Extract structured notes from source material. Comprehensive extraction is the default -- every insight that serves the vault gets extracted. For relevant sources, skip rate must be below 10%. Zero extraction from a relevant source is a BUG. Triggers on "/extract", "/extract [file]", "extract insights", "mine this".
 user-invocable: true
 context: fork

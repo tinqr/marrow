@@ -1,5 +1,5 @@
 ---
-name: marrow:next
+name: next
 description: Surface the most valuable next action by combining task stack, inbox pressure, vault health, and goals. Recommends one specific action with rationale. Triggers on "/next", "what should I do", "what's next".
 user-invocable: true
 context: fork

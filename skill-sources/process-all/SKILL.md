@@ -1,9 +1,9 @@
 ---
-name: marrow:process-all
+name: process-all
 description: Batch process the inbox with fresh context per source. Spawns an isolated subagent for each inbox item to prevent context contamination. Supports dry run mode. Triggers on "/process-all", "process inbox", "batch process".
 ---
 
-# /marrow:process-all
+# /process-all
 
 ## EXECUTE NOW
 

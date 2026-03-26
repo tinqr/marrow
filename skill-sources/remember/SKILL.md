@@ -1,9 +1,9 @@
 ---
-name: marrow:remember
+name: remember
 description: Capture friction as methodology notes. Three modes -- explicit (provide description), contextual (scan current conversation for corrections), and scanning (mine session transcripts for patterns). Triggers on "/remember", "/remember [description]", "/remember --scan".
 ---
 
-# /marrow:remember
+# /remember
 
 ## EXECUTE NOW
 

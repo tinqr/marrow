@@ -1,5 +1,5 @@
 ---
-name: marrow:process
+name: process
 description: End-to-end source processing. Chains queue, extract, connect, and check -- each phase in a fresh subagent. The full pipeline in one command. Triggers on "/process", "/process [file]", "process this end to end".
 user-invocable: true
 context: fork

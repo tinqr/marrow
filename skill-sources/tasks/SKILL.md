@@ -1,5 +1,5 @@
 ---
-name: marrow:tasks
+name: tasks
 description: View and manage the task stack. Shows pending work, completed items, and discoveries. Triggers on "/tasks", "show tasks", "what's pending", "task list".
 user-invocable: true
 context: fork

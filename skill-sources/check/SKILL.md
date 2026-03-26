@@ -1,5 +1,5 @@
 ---
-name: marrow:check
+name: check
 description: Schema validation for notes. Checks required fields, description quality, link health, and composability. Non-blocking -- warns but doesn't prevent capture. Triggers on "/check", "/check [note]", "check schema", "validate note", "validate all".
 user-invocable: true
 context: fork

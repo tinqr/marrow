@@ -1,5 +1,5 @@
 ---
-name: marrow:queue
+name: queue
 description: Add a source file to the processing queue. Checks for duplicates, creates archive folder, moves source from inbox, creates extract task, and updates queue. Triggers on "/queue", "/queue [file]", "queue this for processing".
 user-invocable: true
 context: fork

@@ -1,9 +1,9 @@
 ---
-name: marrow:review
+name: review
 description: Triage accumulated observations. Classifies each finding, detects patterns across them, and generates proposals for system changes. Triggers on "/review", "review observations", "triage findings".
 ---
 
-# /marrow:review
+# /review
 
 ## EXECUTE NOW
 

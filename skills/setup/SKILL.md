@@ -573,7 +573,31 @@ Thresholds are configured in `marrow.yaml`.
 
 ---
 
-## Part 5: Initialize Git and Commit
+## Part 5: Install Skills
+
+Copy the daily-use skills from the plugin's `skill-sources/` directory into the vault's `.claude/skills/` so they're available as unprefixed commands (`/process`, `/connect`, `/check`, etc.).
+
+The plugin root is available via the `CLAUDE_PLUGIN_ROOT` environment variable, which points to the installed plugin directory.
+
+```bash
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(dirname $(dirname $(realpath "$0")))}"
+VAULT_SKILLS="[VAULT_PATH]/.claude/skills"
+mkdir -p "$VAULT_SKILLS"
+
+for skill_dir in "$PLUGIN_ROOT/skill-sources"/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p "$VAULT_SKILLS/$skill_name"
+  cp "$skill_dir/SKILL.md" "$VAULT_SKILLS/$skill_name/SKILL.md"
+done
+```
+
+**IMPORTANT:** Do not run this as a bash script. Use the Write tool to copy each SKILL.md file individually. Read each file from `${CLAUDE_PLUGIN_ROOT}/skill-sources/[name]/SKILL.md` and write it to `[VAULT_PATH]/.claude/skills/[name]/SKILL.md`.
+
+The skills to copy are: `audit`, `check`, `connect`, `extract`, `next`, `process`, `process-all`, `queue`, `remember`, `review`, `revisit`, `tasks`.
+
+---
+
+## Part 6: Initialize Git and Commit
 
 After all files are generated, run:
 
@@ -588,7 +612,7 @@ If git init fails (e.g. directory is already a repo), that's fine -- just add an
 
 ---
 
-## Part 6: Success Message
+## Part 7: Success Message
 
 After everything is done, print:
 
@@ -599,6 +623,7 @@ After everything is done, print:
 > - **ops/** -- tasks, reminders, and session tracking
 > - **templates/** -- note and index structure
 > - **inbox/** and **archive/** -- for processing sources
+> - **.claude/skills/** -- 12 daily-use skills available as `/process`, `/connect`, `/check`, etc.
 >
 > The orient hook will load your context at the start of every session. The auto-commit hook saves changes to git automatically.
 >
