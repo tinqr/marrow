@@ -1,68 +1,16 @@
 #!/bin/bash
 # Marrow -- Session Orientation Hook
-# Archives previous session, then injects vault context into conversation.
+# Injects vault context into conversation at session start.
 
 GUARD_DIR="$(cd "$(dirname "$0")" && pwd)"
 "$GUARD_DIR/vaultguard.sh" || exit 0
-
-INPUT=$(cat)
-SESSION_ID=""
-if command -v jq &>/dev/null; then
-  SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // empty')
-else
-  SESSION_ID=$(echo "$INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | sed 's/"session_id":"//;s/"//')
-fi
-
-READ_CONFIG="$GUARD_DIR/read-config.sh"
-
-# -- Archive phase (silent) ---------------------------------------------------
-
-# Capture previous session content BEFORE overwriting, for injection later
-PREV_SESSION_CONTENT=""
-if [ -f ops/sessions/current.json ]; then
-  PREV_SESSION_CONTENT=$(cat ops/sessions/current.json)
-fi
-
-if [ -n "$SESSION_ID" ] && [ "$(bash "$READ_CONFIG" "session_capture" "true")" = "true" ]; then
-  TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
-  mkdir -p ops/sessions
-
-  if [ -f ops/sessions/current.json ]; then
-    if command -v jq &>/dev/null; then
-      PREV_ID=$(jq -r '.id // empty' ops/sessions/current.json)
-    else
-      PREV_ID=$(grep -o '"id":"[^"]*"' ops/sessions/current.json | head -1 | sed 's/"id":"//;s/"//')
-    fi
-
-    if [ -n "$PREV_ID" ] && [ "$PREV_ID" != "$SESSION_ID" ]; then
-      PREV_TS=$(grep -o '"started":"[^"]*"' ops/sessions/current.json | head -1 | sed 's/"started":"//;s/"//')
-      mv ops/sessions/current.json "ops/sessions/${PREV_TS:-$TIMESTAMP}.json"
-    fi
-  fi
-
-  cat > ops/sessions/current.json << EOF
-{
-  "id": "$SESSION_ID",
-  "started": "$TIMESTAMP",
-  "status": "active"
-}
-EOF
-
-  # Commit session state if git enabled
-  if [ "$(bash "$READ_CONFIG" "git" "true")" = "true" ] && git rev-parse --is-inside-work-tree &>/dev/null; then
-    git add ops/sessions/ 2>/dev/null
-    git commit -m "session start: ${TIMESTAMP}" --quiet 2>/dev/null || true
-  fi
-fi
-
-# -- Injection phase (stdout -> conversation) ----------------------------------
 
 echo "## Workspace Structure"
 echo ""
 if command -v tree &>/dev/null; then
   tree -L 3 --charset ascii -I '.git|node_modules|.marrow-commit-lock' -P '*.md' .
 else
-  find . -name "*.md" -not -path "./.git/*" -maxdepth 3 | sort | while read -r file; do
+  find . -name "*.md" -not -path "./.git/*" -not -path "*/node_modules/*" -maxdepth 3 | sort | while read -r file; do
     depth=$(echo "$file" | tr -cd '/' | wc -c)
     indent=$(printf '%*s' "$((depth * 2))" '')
     echo "${indent}$(basename "$file")"
@@ -72,10 +20,10 @@ echo ""
 echo "---"
 echo ""
 
-# Previous session context (captured before archive overwrote current.json)
-if [ -n "$PREV_SESSION_CONTENT" ]; then
+# Previous session context
+if [ -f ops/sessions/current.json ]; then
   echo "--- Previous session context ---"
-  echo "$PREV_SESSION_CONTENT"
+  cat ops/sessions/current.json
   echo ""
 fi
 

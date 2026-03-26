@@ -70,34 +70,28 @@ cd "$TEST_VAULT"
 rm -f ops/sessions/current.json ops/sessions/*.json
 
 # Test: produces output with vault structure
-OUTPUT=$(echo '{"session_id":"test-session-1"}' | CLAUDE_PROJECT_DIR="$TEST_VAULT" bash "$HOOKS_DIR/session-orient.sh" 2>/dev/null)
+OUTPUT=$(echo '{}' | CLAUDE_PROJECT_DIR="$TEST_VAULT" bash "$HOOKS_DIR/session-orient.sh" 2>/dev/null)
 if echo "$OUTPUT" | grep -q "goals"; then
   assert_exit 0 0 "output includes goals content"
 else
   assert_exit 0 1 "output includes goals content"
 fi
 
-# Test: creates current.json
-if [ -f ops/sessions/current.json ]; then
-  assert_exit 0 0 "creates current.json"
+# Test: shows previous session context if current.json exists
+echo '{"id":"prev","started":"20260325","status":"completed"}' > ops/sessions/current.json
+OUTPUT=$(echo '{}' | CLAUDE_PROJECT_DIR="$TEST_VAULT" bash "$HOOKS_DIR/session-orient.sh" 2>/dev/null)
+if echo "$OUTPUT" | grep -q "Previous session context"; then
+  assert_exit 0 0 "shows previous session context"
 else
-  assert_exit 0 1 "creates current.json"
+  assert_exit 0 1 "shows previous session context"
 fi
+rm -f ops/sessions/current.json
 
-# Test: current.json has session ID
-if grep -q "test-session-1" ops/sessions/current.json 2>/dev/null; then
-  assert_exit 0 0 "current.json contains session ID"
+# Test: includes identity content
+if echo "$OUTPUT" | grep -qi "identity\|methodology"; then
+  assert_exit 0 0 "includes identity/methodology content"
 else
-  assert_exit 0 1 "current.json contains session ID"
-fi
-
-# Test: second session promotes previous
-OUTPUT=$(echo '{"session_id":"test-session-2"}' | CLAUDE_PROJECT_DIR="$TEST_VAULT" bash "$HOOKS_DIR/session-orient.sh" 2>/dev/null)
-ARCHIVED=$(ls ops/sessions/*.json 2>/dev/null | grep -v current | wc -l | tr -d ' ')
-if [ "$ARCHIVED" -ge 1 ]; then
-  assert_exit 0 0 "previous session archived on new session"
-else
-  assert_exit 0 1 "previous session archived on new session"
+  assert_exit 0 1 "includes identity/methodology content"
 fi
 
 # Test: condition signal fires when inbox exceeds threshold
@@ -258,29 +252,25 @@ echo "=== session-capture tests ==="
 cd "$TEST_VAULT"
 rm -f ops/sessions/current.json ops/sessions/*.json
 
-# Setup: create a current session
-echo '{"session_id":"capture-test"}' | CLAUDE_PROJECT_DIR="$TEST_VAULT" bash "$HOOKS_DIR/session-orient.sh" >/dev/null 2>/dev/null
-
-# Test: stop hook updates current.json with ended timestamp
+# Test: stop hook creates timestamped session file
 echo '{"session_id":"capture-test"}' | CLAUDE_PROJECT_DIR="$TEST_VAULT" bash "$HOOKS_DIR/session-capture.sh" 2>/dev/null
-if grep -q '"status": "completed"' ops/sessions/current.json 2>/dev/null; then
-  assert_exit 0 0 "session-capture marks session completed"
+CAPTURED=$(ls ops/sessions/*.json 2>/dev/null | head -1)
+if [ -n "$CAPTURED" ]; then
+  assert_exit 0 0 "session-capture creates timestamped file"
 else
-  assert_exit 0 1 "session-capture marks session completed"
+  assert_exit 0 1 "session-capture creates timestamped file"
 fi
 
-if grep -q '"ended"' ops/sessions/current.json 2>/dev/null; then
-  assert_exit 0 0 "session-capture adds ended timestamp"
+if grep -q '"completed"' "$CAPTURED" 2>/dev/null; then
+  assert_exit 0 0 "session-capture marks status completed"
 else
-  assert_exit 0 1 "session-capture adds ended timestamp"
+  assert_exit 0 1 "session-capture marks status completed"
 fi
 
-# Test: previous session content is shown in orient (not empty skeleton)
-echo '{"session_id":"orient-after-capture"}' | CLAUDE_PROJECT_DIR="$TEST_VAULT" bash "$HOOKS_DIR/session-orient.sh" 2>/dev/null | grep -q "completed"
-if [ $? -eq 0 ]; then
-  assert_exit 0 0 "orient shows previous session content (not empty skeleton)"
+if grep -q '"ended"' "$CAPTURED" 2>/dev/null; then
+  assert_exit 0 0 "session-capture includes ended timestamp"
 else
-  assert_exit 0 1 "orient shows previous session content (not empty skeleton)"
+  assert_exit 0 1 "session-capture includes ended timestamp"
 fi
 
 # Clean up
