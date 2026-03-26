@@ -1,25 +1,31 @@
 #!/bin/bash
-# Marrow -- Note Validation Hook
-# Validates notes have required frontmatter fields.
-# PostToolUse Write hook. Non-blocking.
+# Marrow -- Schema Enforcement Hook
+# Validates notes in the knowledge space have required fields.
+# Runs as PostToolUse hook on Write events.
+# Receives tool input as JSON on stdin.
 
 GUARD_DIR="$(cd "$(dirname "$0")" && pwd)"
 if ! "$GUARD_DIR/vaultguard.sh"; then
-  cat > /dev/null
+  cat > /dev/null  # drain stdin
   exit 0
 fi
 
+# Read JSON from stdin
 INPUT=$(cat)
 
+# Extract file path (requires jq)
 if command -v jq &>/dev/null; then
   FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 else
+  # Fallback: try to extract with grep/sed if jq unavailable
   FILE=$(echo "$INPUT" | grep -o '"file_path":"[^"]*"' | head -1 | sed 's/"file_path":"//;s/"//')
 fi
 
+# Early exit if no file path
 [ -z "$FILE" ] && exit 0
 [ ! -f "$FILE" ] && exit 0
 
+# Only validate notes in the knowledge space
 case "$FILE" in
   */notes/*|*/inbox/*)
     WARNS=""
