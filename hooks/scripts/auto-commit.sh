@@ -1,54 +1,48 @@
-#!/bin/bash
-# Marrow -- Auto-Commit Hook
-# Commits vault changes after writes. Async PostToolUse hook.
-# Selective staging -- only vault content, not .claude/.
+#!/usr/bin/env bash
+# auto-commit.sh — Auto-commit vault changes after writes (async PostToolUse hook)
+# Single source of truth for vault auto-commits. 10-minute debounce.
 
-set -e
+set -euo pipefail
 
-cd "${CLAUDE_PROJECT_DIR:-$(pwd)}"
+VAULT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
-GUARD_DIR="$(cd "$(dirname "$0")" && pwd)"
-"$GUARD_DIR/vaultguard.sh" || exit 0
-
-# Check git config
-READ_CONFIG="$GUARD_DIR/read-config.sh"
-if [ "$(bash "$READ_CONFIG" "git" "true")" != "true" ]; then
+# Guard: only run inside a vault
+if [ ! -f "$VAULT_ROOT/.marrow" ]; then
   exit 0
 fi
 
-# Must be inside a git repo
-git rev-parse --is-inside-work-tree &>/dev/null || exit 0
+cd "$VAULT_ROOT"
 
-# Debounce
-LOCKFILE="${CLAUDE_PROJECT_DIR:-.}/.marrow-commit-lock"
-DEBOUNCE=$(grep "auto_commit_debounce_seconds" marrow.yaml 2>/dev/null | head -1 | sed 's/[^0-9]//g')
-DEBOUNCE="${DEBOUNCE:-300}"
-
-if [ -f "$LOCKFILE" ]; then
-  # macOS stat -f %m, Linux stat -c %Y
-  LOCK_MTIME=$(stat -f %m "$LOCKFILE" 2>/dev/null || stat -c %Y "$LOCKFILE" 2>/dev/null || echo 0)
-  NOW=$(date +%s)
-  ELAPSED=$(( NOW - LOCK_MTIME ))
-  if [ "$ELAPSED" -lt "$DEBOUNCE" ]; then
-    exit 0
-  fi
-fi
-
-# Selective staging -- vault content only
-for path in notes/ inbox/ self/ ops/ templates/ CLAUDE.md marrow.yaml .marrow; do
-  [ -e "$path" ] && git add "$path" 2>/dev/null || true
-done
-
-# Check for staged changes
-if git diff --cached --quiet 2>/dev/null; then
+# Guard: only run if git is initialized
+if [ ! -d ".git" ]; then
   exit 0
 fi
 
-# Commit
-FILE_COUNT=$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
-git commit -m "marrow: auto-save $FILE_COUNT file(s)" 2>/dev/null || true
+# Debounce: skip if last auto-commit was less than 10 minutes ago
+LAST_COMMIT_TIME=$(git log -1 --format="%ct" --grep="marrow: auto-save" 2>/dev/null)
+LAST_COMMIT_TIME="${LAST_COMMIT_TIME:-0}"
+NOW=$(date +%s)
+ELAPSED=$(( NOW - LAST_COMMIT_TIME ))
+if [ "$ELAPSED" -lt 600 ]; then
+  exit 0
+fi
 
-# Update lockfile
-touch "$LOCKFILE"
+# Stage vault content directories only
+git add notes/ 2>/dev/null || true
+git add inbox/ 2>/dev/null || true
+git add self/ 2>/dev/null || true
+git add ops/ 2>/dev/null || true
+git add templates/ 2>/dev/null || true
+git add CLAUDE.md .marrow .gitignore marrow.yaml 2>/dev/null || true
+
+# Check if anything is staged
+if git diff --staged --quiet; then
+  exit 0
+fi
+
+# Commit with clean message
+CHANGED_COUNT=$(git diff --staged --name-only | wc -l | tr -d ' ')
+
+git commit -m "marrow: auto-save ${CHANGED_COUNT} file(s)" -q 2>/dev/null || true
 
 exit 0

@@ -192,13 +192,16 @@ echo "=== auto-commit tests ==="
 AUTO_TEST_DIR=$(mktemp -d)
 cp -r "$TEST_VAULT/"* "$AUTO_TEST_DIR/"
 cp "$TEST_VAULT/.marrow" "$AUTO_TEST_DIR/"
+# auto-commit.sh uses BASH_SOURCE to find vault root, so put script in .claude/hooks/
+mkdir -p "$AUTO_TEST_DIR/.claude/hooks"
+cp "$HOOKS_DIR/auto-commit.sh" "$AUTO_TEST_DIR/.claude/hooks/auto-commit.sh"
 cd "$AUTO_TEST_DIR"
 git init --quiet
 git add -A && git commit -m "init" --quiet
 
 # Test: auto-commit stages and commits vault changes
 echo "test content" > notes/test-auto.md
-RESULT=$(echo '{"tool_input":{"file_path":"'"$AUTO_TEST_DIR"'/notes/test-auto.md"}}' | CLAUDE_PROJECT_DIR="$AUTO_TEST_DIR" bash "$HOOKS_DIR/auto-commit.sh" 2>/dev/null; echo $?)
+bash .claude/hooks/auto-commit.sh 2>/dev/null || true
 LAST_MSG=$(git log --oneline -1 2>/dev/null)
 if echo "$LAST_MSG" | grep -q "marrow: auto-save"; then
   assert_exit 0 0 "auto-commit creates commit with correct message"
@@ -206,10 +209,10 @@ else
   assert_exit 0 1 "auto-commit creates commit (got: $LAST_MSG)"
 fi
 
-# Test: debounce prevents immediate second commit
+# Test: debounce prevents immediate second commit (last commit was just now)
 echo "more content" > notes/test-auto2.md
 BEFORE=$(git rev-parse HEAD)
-echo '{}' | CLAUDE_PROJECT_DIR="$AUTO_TEST_DIR" bash "$HOOKS_DIR/auto-commit.sh" 2>/dev/null || true
+bash .claude/hooks/auto-commit.sh 2>/dev/null || true
 AFTER=$(git rev-parse HEAD)
 if [ "$BEFORE" = "$AFTER" ]; then
   assert_exit 0 0 "debounce prevents immediate second commit"
@@ -220,26 +223,24 @@ fi
 # Test: .claude/ directory is NOT staged
 mkdir -p .claude/skills
 echo "skill content" > .claude/skills/test.md
-echo '{}' | CLAUDE_PROJECT_DIR="$AUTO_TEST_DIR" bash "$HOOKS_DIR/auto-commit.sh" 2>/dev/null || true
+bash .claude/hooks/auto-commit.sh 2>/dev/null || true
 if git status --short .claude/ 2>/dev/null | grep -q "test.md"; then
   assert_exit 0 0 ".claude/ excluded from staging"
 else
   assert_exit 0 0 ".claude/ excluded from staging"
 fi
 
-# Test: git:false config skips commit
-echo "git: false" > .marrow
-rm -f .marrow-commit-lock
+# Test: no .marrow = no commit
+rm -f .marrow
 echo "should not commit" > notes/test-auto3.md
-git add notes/test-auto3.md 2>/dev/null  # stage manually
-git reset HEAD notes/test-auto3.md --quiet 2>/dev/null  # unstage
 BEFORE=$(git rev-parse HEAD)
-echo '{}' | CLAUDE_PROJECT_DIR="$AUTO_TEST_DIR" bash "$HOOKS_DIR/auto-commit.sh" 2>/dev/null || true
+bash .claude/hooks/auto-commit.sh 2>/dev/null || true
 AFTER=$(git rev-parse HEAD)
+echo "git: true" > .marrow  # restore
 if [ "$BEFORE" = "$AFTER" ]; then
-  assert_exit 0 0 "git:false skips commit"
+  assert_exit 0 0 "no .marrow file skips commit"
 else
-  assert_exit 0 1 "git:false skips commit"
+  assert_exit 0 1 "no .marrow file skips commit"
 fi
 
 # Clean up auto-commit tests
