@@ -139,27 +139,30 @@ Say EXACTLY this (do not rephrase, do not say "Marrow" -- say "knowledge vault")
 
 ## Part 4: Generate Vault
 
-Create ALL of the following files in the vault directory. Use the Write tool for each file.
+### Step A: Static files (batch via Bash)
 
-### File 1: `.marrow` (guard file)
+Run this as a single Bash command, replacing `[VAULT_PATH]` with the actual vault path. This creates all fixed-content files in one operation.
 
-```
+```bash
+V="[VAULT_PATH]"
+
+# directories
+mkdir -p "$V/self" "$V/templates" "$V/ops/methodology" "$V/ops/observations" "$V/ops/sessions" "$V/ops/queue" "$V/inbox" "$V/archive" "$V/notes"
+
+# .marrow guard file
+cat > "$V/.marrow" << 'MARROW'
 # Marrow vault marker + config
 # Do not delete -- hooks only run when this file exists.
 
 git: true
 session_capture: true
-```
+MARROW
 
-### File 2: `.gitignore`
+# .gitignore
+echo ".marrow-commit-lock" > "$V/.gitignore"
 
-```
-.marrow-commit-lock
-```
-
-### File 3: `marrow.yaml` (maintenance thresholds)
-
-```yaml
+# marrow.yaml
+cat > "$V/marrow.yaml" << 'YAML'
 maintenance:
   inbox_warning: 5
   observations_warning: 10
@@ -167,9 +170,90 @@ maintenance:
   stale_index_days: 30
   session_log_max: 8
   auto_commit_debounce_seconds: 300
+YAML
+
+# self/methodology.md
+cat > "$V/self/methodology.md" << 'MD'
+---
+description: How I process, connect, and maintain knowledge
+type: index
+---
+
+# methodology
+
+## Principles
+
+- **Prose-as-title**: every note is a proposition -- a sentence that asserts something
+- **Wiki links**: connections are edges in a graph, not folders in a hierarchy
+- **Indexes**: navigation lives in index files, not folder structures
+- **Inbox first**: nothing goes directly to notes/ -- everything routes through inbox/ first
+- **Session rhythm**: orient, work, persist -- every session, no exceptions
+
+## Session Rhythm
+
+**Orient**: Read self/, check current session state, surface tasks and reminders, summarize back.
+
+**Work**: One task at a time. Update notes as decisions are made. Drop discoveries in inbox/.
+
+**Persist**: Update feature notes and goals, write session state, confirm state saved.
+MD
+
+# templates/index.md
+cat > "$V/templates/index.md" << 'MD'
+---
+description: Navigation index for [area/project/feature]
+type: index
+---
+
+# [index name]
+
+[content organized by topic]
+
+---
+
+Topics:
+- [[parent-index]]
+MD
+
+# ops/tasks.md
+cat > "$V/ops/tasks.md" << 'MD'
+# Tasks
+
+## Active
+
+(no tasks yet -- add your first with /tasks)
+
+## Completed
+MD
+
+# ops/reminders.md
+cat > "$V/ops/reminders.md" << 'MD'
+# Reminders
+
+(no reminders yet)
+MD
+
+# ops/methodology/methodology.md
+cat > "$V/ops/methodology/methodology.md" << 'MD'
+---
+description: Index of earned lessons
+type: index
+---
+
+# methodology
+
+Lessons learned during sessions. Each note captures one behavioral rule.
+
+(no lessons yet -- save your first with /remember)
+MD
+
+# .gitkeep for empty directories
+touch "$V/ops/observations/.gitkeep" "$V/ops/sessions/.gitkeep" "$V/ops/queue/.gitkeep" "$V/inbox/.gitkeep" "$V/archive/.gitkeep"
 ```
 
-### File 4: `self/identity.md` (PERSONALIZED)
+### Step B: Personalized files (use Write tool for each)
+
+### File 1: `self/identity.md` (PERSONALIZED)
 
 Write this in the agent's voice. Use the identity, personality, and work style extracted from the conversation.
 
@@ -194,34 +278,7 @@ I am the agent for [NAME]'s knowledge vault. [NAME] is a [ROLE] who [WHAT_THEY_D
 - Capture immediately -- if something surfaces during work that belongs elsewhere, drop it in inbox/
 ```
 
-### File 5: `self/methodology.md` (fixed template)
-
-```markdown
----
-description: How I process, connect, and maintain knowledge
-type: index
----
-
-# methodology
-
-## Principles
-
-- **Prose-as-title**: every note is a proposition -- a sentence that asserts something
-- **Wiki links**: connections are edges in a graph, not folders in a hierarchy
-- **Indexes**: navigation lives in index files, not folder structures
-- **Inbox first**: nothing goes directly to notes/ -- everything routes through inbox/ first
-- **Session rhythm**: orient, work, persist -- every session, no exceptions
-
-## Session Rhythm
-
-**Orient**: Read self/, check current session state, surface tasks and reminders, summarize back.
-
-**Work**: One task at a time. Update notes as decisions are made. Drop discoveries in inbox/.
-
-**Persist**: Update feature notes and goals, write session state, confirm state saved.
-```
-
-### File 6: `self/goals.md` (PERSONALIZED)
+### File 2: `self/goals.md` (PERSONALIZED)
 
 Seed from the conversation. The first project goes under Active Threads.
 
@@ -246,7 +303,7 @@ type: index
 (nothing yet)
 ```
 
-### File 7: `templates/note.md`
+### File 3: `templates/note.md` (PERSONALIZED)
 
 Replace `[AREAS]` with the user's domains joined by ` | ` (e.g. `design | engineering | learning`).
 
@@ -269,77 +326,7 @@ Topics:
 - [[index-name]]
 ```
 
-### File 8: `templates/index.md`
-
-```markdown
----
-description: Navigation index for [area/project/feature]
-type: index
----
-
-# [index name]
-
-[content organized by topic]
-
----
-
-Topics:
-- [[parent-index]]
-```
-
-### File 9: `ops/tasks.md`
-
-```markdown
-# Tasks
-
-## Active
-
-(no tasks yet -- add your first with /tasks)
-
-## Completed
-```
-
-### File 10: `ops/reminders.md`
-
-```markdown
-# Reminders
-
-(no reminders yet)
-```
-
-### File 11: `ops/methodology/methodology.md`
-
-```markdown
----
-description: Index of earned lessons
-type: index
----
-
-# methodology
-
-Lessons learned during sessions. Each note captures one behavioral rule.
-
-(no lessons yet -- save your first with /remember)
-```
-
-### File 12: Empty directories
-
-Create these directories (use `mkdir -p`):
-
-- `ops/observations/`
-- `ops/sessions/`
-- `ops/queue/`
-- `inbox/`
-- `archive/`
-
-Add a `.gitkeep` in each so git tracks them:
-
-```bash
-mkdir -p ops/observations ops/sessions ops/queue inbox archive
-touch ops/observations/.gitkeep ops/sessions/.gitkeep ops/queue/.gitkeep inbox/.gitkeep archive/.gitkeep
-```
-
-### File 13: Area maps (PERSONALIZED) -- one per domain
+### File 4: Area maps (PERSONALIZED) -- one per domain
 
 For each domain extracted from the conversation, create `notes/[AREA].md`:
 
@@ -359,7 +346,7 @@ Example: if domains are "design", "engineering", "learning", create:
 - `notes/engineering.md`
 - `notes/learning.md`
 
-### File 14: First project (PERSONALIZED)
+### File 5: First project (PERSONALIZED)
 
 Create `notes/[PROJECT]/[PROJECT].md`:
 
@@ -384,7 +371,7 @@ Just started.
 
 Use a slug for the folder name (lowercase, hyphens). Example: "My iOS App" becomes `notes/my-ios-app/my-ios-app.md`.
 
-### File 15: `CLAUDE.md` (THE MOST IMPORTANT FILE -- PERSONALIZED)
+### File 6: `CLAUDE.md` (THE MOST IMPORTANT FILE -- PERSONALIZED)
 
 This is ~250-300 lines. Personalize it with the user's name, personality, domains, and extraction categories.
 
@@ -570,6 +557,27 @@ Thresholds are configured in `marrow.yaml`.
 - **Orphan Drift** -- run `/connect` after captures. Orphans that can't be connected shouldn't exist.
 - **Temporal Staleness** -- feature notes untouched but still active = stale.
 ````
+
+### Step C: Verify all vault files
+
+Run this to confirm every expected file exists:
+
+```bash
+V="[VAULT_PATH]"
+missing=0
+for f in .marrow .gitignore marrow.yaml self/identity.md self/methodology.md self/goals.md templates/note.md templates/index.md ops/tasks.md ops/reminders.md ops/methodology/methodology.md CLAUDE.md; do
+  if [ ! -f "$V/$f" ]; then echo "MISSING: $f"; missing=$((missing + 1)); fi
+done
+if [ "$missing" -eq 0 ]; then echo "All 12 core files present."; else echo "$missing file(s) missing -- fix before continuing."; fi
+```
+
+Also verify at least one area map and the first project exist:
+
+```bash
+ls "$V"/notes/*.md "$V"/notes/*/  2>/dev/null || echo "MISSING: area maps or project folder"
+```
+
+Do not proceed to Part 5 until all files are confirmed.
 
 ---
 
